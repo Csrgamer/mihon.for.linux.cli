@@ -1,86 +1,192 @@
-<div align="center">
+# Mihon CLI for Linux
 
-<a href="https://mihon.app">
-    <img src="./.github/assets/logo.png" alt="Mihon logo" title="Mihon logo" width="80"/>
-</a>
-
-# Mihon [App](#)
-
-### Full-featured reader
-Discover and read manga, webtoons, comics, and more – easier than ever on your Android device.
-
-[![Discord server](https://img.shields.io/discord/1195734228319617024.svg?label=&labelColor=6A7EC2&color=7389D8&logo=discord&logoColor=FFFFFF)](https://discord.gg/mihon)
-[![GitHub downloads](https://img.shields.io/github/downloads/mihonapp/mihon/total?label=downloads&labelColor=27303D&color=0D1117&logo=github&logoColor=FFFFFF&style=flat)](https://mihon.app/download)
-
-[![CI](https://img.shields.io/github/actions/workflow/status/mihonapp/mihon/build.yml?labelColor=27303D)](https://github.com/mihonapp/mihon/actions/workflows/build_push.yml)
-[![License: Apache-2.0](https://img.shields.io/github/license/mihonapp/mihon?labelColor=27303D&color=0877d2)](/LICENSE)
-[![Translation status](https://img.shields.io/weblate/progress/mihon?labelColor=27303D&color=946300)](https://hosted.weblate.org/engage/mihon/)
-
-## Download
-
-[![Mihon Stable](https://img.shields.io/github/release/mihonapp/mihon.svg?maxAge=3600&label=Stable&labelColor=06599d&color=043b69)](https://mihon.app/download)
-[![Mihon Beta](https://img.shields.io/github/v/release/mihonapp/mihon-preview.svg?maxAge=3600&label=Beta&labelColor=2c2c47&color=1c1c39)](https://mihon.app/download)
-
-*Requires Android 8.0 or higher.*
+A free and open source manga downloader for Linux CLI, based on Mihon.
 
 ## Features
 
-<div align="left">
+- 📚 Search manga across multiple sources
+- 💾 Download manga chapters
+- 🔄 Automatic update checks
+- 📖 Local library management
+- ⚙️ Configurable settings
+- 🚀 Concurrent downloads for faster speeds
 
-* Local reading of content.
-* A configurable reader with multiple viewers, reading directions and other settings.
-* Tracker support: [MyAnimeList](https://myanimelist.net/), [AniList](https://anilist.co/), [Kitsu](https://kitsu.app/), [MangaUpdates](https://mangaupdates.com), [Shikimori](https://shikimori.one), and [Bangumi](https://bgm.tv/) support.
-* Categories to organize your library.
-* Light and dark themes.
-* Schedule updating your library for new chapters.
-* Create backups locally to read offline or to your desired cloud service.
-* Plus much more...
+## Supported Sources
 
-</div>
+- MangaDex
+- AsuraScans
+- ManhuaCalf
+- (More sources coming)
+
+## Installation
+
+### Prerequisites
+- Kotlin 1.9.21+
+- Java 11+
+- Gradle
+
+### Build from Source
+
+```bash
+./gradlew build
+./gradlew run
+```
+
+### Install
+
+```bash
+./gradlew installDist
+# Binary will be in build/install/mihon-cli/bin/
+```
+
+## Usage
+
+### Search for Manga
+
+```bash
+# Search across all sources
+mihon search "attack on titan"
+
+# Search specific source
+mihon search "attack on titan" --source MangaDex
+
+# Limit results
+mihon search "attack on titan" --limit 10
+```
+
+### Download Manga
+
+```bash
+# Download specific chapter range
+mihon download "https://mangadex.org/title/xxxxx" --start 1 --end 50
+
+# Download to custom directory
+mihon download "URL" --output /path/to/manga
+
+# Use multiple threads
+mihon download "URL" --threads 5
+
+# Skip existing chapters
+mihon download "URL" --skip-existing
+```
+
+### Manage Library
+
+```bash
+# List all manga
+mihon list
+
+# List all with sorting
+mihon list --sort date
+
+# Show all including completed
+mihon list --all
+```
+
+### Check Updates
+
+```bash
+# Check updates for all manga
+mihon update --all
+
+# Check specific manga
+mihon update --manga "Attack on Titan"
+```
+
+### Configuration
+
+```bash
+# Show all settings
+mihon config
+
+# Show specific setting
+mihon config download_dir
+
+# Change setting
+mihon config download_dir /path/to/manga
+mihon config threads 5
+mihon config image_quality high
+```
+
+## Configuration File
+
+Settings are stored in `~/.mihon/config.properties`:
+
+```properties
+download_dir=./manga
+threads=3
+image_quality=high
+auto_update=false
+```
+
+## Database
+
+Manga library is stored locally in `~/.mihon/library.db` (SQLite)
+
+## Architecture
+
+```
+src/
+├── commands/          # CLI commands
+├── sources/           # Manga source implementations
+├── downloader/        # Download logic
+├── db/               # Database management
+└── config/           # Configuration management
+```
+
+## Development
+
+### Adding a New Source
+
+1. Create a new class extending `MangaSource` in `src/main/kotlin/com/csrgamer/mihon/cli/sources/`
+2. Implement required methods: `search()`, `getChapters()`, `downloadChapter()`
+3. Register in `SourceManager.kt`
+
+Example:
+
+```kotlin
+class NewSource : MangaSource() {
+    override val name = "NewSource"
+    
+    override suspend fun search(query: String, limit: Int): List<Manga> {
+        // Implement search
+    }
+    
+    override suspend fun getChapters(mangaUrl: String): List<Chapter> {
+        // Implement chapter fetching
+    }
+    
+    override suspend fun downloadChapter(chapterUrl: String, outputPath: String) {
+        // Implement download
+    }
+}
+```
+
+## License
+
+This project is based on Mihon and maintains GPL compatibility.
+
+## Disclaimer
+
+This tool is for personal use only. Users are responsible for complying with copyright laws in their jurisdiction.
 
 ## Contributing
 
-[Code of conduct](./CODE_OF_CONDUCT.md) · [Contributing guide](./CONTRIBUTING.md)
+Contributions are welcome! Please:
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
 
-Before reporting a new issue, take a look at the [FAQ](https://mihon.app/docs/faq/general), the [changelog](https://mihon.app/changelogs/) and the already opened [issues](https://github.com/mihonapp/mihon/issues); if you got any questions, join our [Discord server](https://discord.gg/mihon).
+## TODOs
 
-
-### Repositories
-
-[![mihonapp/website - GitHub](https://github-readme-stats.vercel.app/api/pin/?username=mihonapp&repo=website&bg_color=161B22&text_color=c9d1d9&title_color=0877d2&icon_color=0877d2&border_radius=8&hide_border=true&description_lines_count=2)](https://github.com/mihonapp/website/)
-[![mihonapp/bitmap.kt - GitHub](https://github-readme-stats.vercel.app/api/pin/?username=mihonapp&repo=bitmap.kt&bg_color=161B22&text_color=c9d1d9&title_color=0877d2&icon_color=0877d2&border_radius=8&hide_border=true&description_lines_count=2)](https://github.com/mihonapp/bitmap.kt/)
-
-### Credits
-
-Thank you to all the people who have contributed!
-
-<a href="https://github.com/mihonapp/mihon/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=mihonapp/mihon" alt="Mihon app contributors" title="Mihon app contributors" width="800"/>
-</a>
-
-### Disclaimer
-
-The developer(s) of this application does not have any affiliation with the content providers available, and this application hosts zero content.
-
-### License
-
-<pre>
-Copyright © 2015 Javier Tomás
-Copyright © 2024 Mihon Open Source Project
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-</pre>
-
-</div>
+- [ ] Complete MangaDex API integration
+- [ ] Complete HTML parsing for other sources
+- [ ] Implement image download and conversion
+- [ ] Add PDF export
+- [ ] Add CBZ/CBR format support
+- [ ] Implement concurrent chapter downloads
+- [ ] Add proxy support
+- [ ] Add authentication for premium sources
+- [ ] Implement resume on failed downloads
+- [ ] Add scheduling for automatic updates
