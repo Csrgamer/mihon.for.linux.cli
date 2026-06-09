@@ -20,7 +20,12 @@ class SourceManager {
     private val sources: List<MangaSource> = listOf(
         MangadexSource(),
         AsuraScansSource(),
-        ManhuaCalfSource()
+        ManhuaCalfSource(),
+        MangaReaderSource(),
+        MangaKakalotSource(),
+        BatoSource(),
+        ScanSource(),
+        ChainSource()
     )
 
     suspend fun searchAllSources(query: String, limit: Int): List<Manga> {
